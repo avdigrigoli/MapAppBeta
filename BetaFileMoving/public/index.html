@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Excel to Json</title>
+  <script src="https://unpkg.com/read-excel-file@4.1.0/bundle/read-excel-file.min.js"></script>
+</head>
+
+<body>
+<div style="margin: auto; width: 50%; padding: 30px; background-color:#dedede ;">
+  <h2>Showing excel in Json</h2>
+  <input type="file" id="input">
+  <br><br>
+  <textarea name="json-data" id="json-data" rows="25" style="width: 100%;"></textarea>
+  <br><br>
+  <button id="dl-json">download json</button>
+  <button id="up-json">update json</button>
+  <button><a href="test.html">view json</a></button>
+</div>
+
+<script>
+  var input = document.getElementById('input');
+  input.addEventListener('change', function(){
+    readXlsxFile(input.files[0]).then(function(data){
+      var i = 0;
+      var headers = [];
+      var json_object = [];
+
+      data.map((row, index) => {
+        if(i == 0){
+          headers = row;
+        }
+
+        if(i > 0){
+          var temp = {};
+          for(var x = 0; x < row.length; x++){
+            temp[headers[x]] = row[x];
+          }
+          json_object.push(temp);
+        }
+        i++;
+      });
+
+      document.getElementById('json-data').value = JSON.stringify(json_object, null, 2);
+    });
+  })
+
+  document.getElementById('dl-json').onclick = function() {
+    var json_str = document.getElementById('json-data').value;
+    downloadObjectAsJson(json_str, 'excel_to_json');
+  };
+
+
+  function downloadObjectAsJson(str, filename){
+    var data_str = "data:text/json;charset=utf-8," + encodeURIComponent(str);
+    var anchor = document.createElement('a');
+    anchor.setAttribute("href", data_str);
+    anchor.setAttribute("download", filename + ".json");
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+  }
+
+</script>
+
+</body>
+</html>
